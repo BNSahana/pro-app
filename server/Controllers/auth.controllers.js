@@ -31,7 +31,7 @@ export const Register = async (req, res) => {
 
         const userResponse = await newUser.save();
 
-        const token = jwt.sign({ userId: userResponse._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: userResponse._id }, process.env.SECRET_KEY, { expiresIn: '1d' });
 
         res.status(201).json({
             message: "User registered successfully.",
@@ -77,7 +77,7 @@ export const Login = async (req, res) => {
             });
         }
 
-        const token = jwt.sign({ userId: registeredUser._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: registeredUser._id }, process.env.SECRET_KEY, { expiresIn: '1d' });
 
         res.status(200).json({
             message: "User logged in successfully.",
@@ -96,13 +96,19 @@ export const Login = async (req, res) => {
 
 export const updateUser = async (req, res) => {
     try {
-        const { name, oldPassword, newPassword } = req.body;
+        const { name, email, oldPassword, newPassword } = req.body;
 
         const token = req.headers.authorization.split(' ')[1];
+        console.log('Received Token:', token); // Debug log
+
         const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
+        console.log('Decoded Token:', decodedToken); // Debug log
+
         const userId = decodedToken.userId;
+        console.log('User ID from Token:', userId); // Debug log
 
         const user = await User.findById(userId);
+        console.log('User from DB:', user); // Debug log
 
         if (!user) {
             return res.status(401).json({ message: 'Unauthorized access.' });
@@ -110,6 +116,10 @@ export const updateUser = async (req, res) => {
 
         if (name) {
             user.name = name;
+        }
+
+        if (email) {
+            user.email = email;
         }
 
         if (oldPassword && newPassword) {
@@ -128,6 +138,7 @@ export const updateUser = async (req, res) => {
         res.status(200).json({
             message: 'User information updated successfully.',
             name: user.name,
+            email: user.email,
         });
     } catch (error) {
         console.error("Update error: ", error);
@@ -137,6 +148,7 @@ export const updateUser = async (req, res) => {
         });
     }
 };
+
 
 export const Logout = async (req, res) => {
     try {

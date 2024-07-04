@@ -25,7 +25,7 @@ export const createTask = async (req, res) => {
             section: 'todo',
             priority,
             checklist,
-            refUserId: userId ,
+            refUserId: userId,
             assignTo 
         };
 
@@ -46,6 +46,7 @@ export const createTask = async (req, res) => {
         });
     }
 }
+
 
 
 export const getAllTasks = async (req, res) => {
